@@ -92,7 +92,7 @@ function render(){
   h+='<div class="wrap"><header class="top"><div class="logo"><i></i>SWAZZI FOOTBALL</div><select id="flt" aria-label="Filter by competition">'+["All"].concat(LG).map(function(l){return '<option'+(l==cur?' selected':'')+'>'+l+'</option>'}).join('')+'</select></header>';
   h+='<section class="hero"><div><h1>Football only. Every pick explained.</h1><p>Daily football news and match predictions from the leagues that matter.</p></div><div class="feat">'+(f?'<small>Latest prediction: '+esc(f.league)+'</small><div class="vs"><span>'+esc(f.home)+'</span><em>v</em><span>'+esc(f.away)+'</span></div>'+bar(f)+'<div class="pick">Our pick:<b>'+esc(f.score)+'</b></div>':'<p class="empty">Predictions will appear here.</p>')+'</div></section>';
   h+='<div class="cols"><section><h2>Latest news</h2><p class="sub">Tap a headline to read the full story.</p>'+(As.length?As.map(function(x){return '<article class="story"><details><summary><span class="tag">'+esc(x.league)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary)+'</p><span class="meta">'+fmt(x.created_at)+'</span></summary><div class="body">'+String(x.body||'').split(/\n\s*\n/).map(function(p){return '<p>'+esc(p)+'</p>'}).join('')+'</div></details>'+tools('a',x.id)+'</article>'}).join(''):'<p class="empty">No stories yet.'+(admin?' Use Write article to add the first one.':' Check back soon.')+'</p>')+'</section>';
-  h+='<section><h2>Match predictions</h2><p class="sub">Win, draw and loss chances, plus our score pick.</p>'+(Ps.length?Ps.map(function(x){return '<div class="card"><div class="row"><span>'+esc(x.home)+' v '+esc(x.away)+'</span><span class="sc">'+esc(x.score)+'</span></div><div class="lg">'+esc(x.league)+'</div>'+bar(x)+(x.note?'<p class="why">'+esc(x.note)+'</p>':'')+tools('p',x.id)+'</div>'}).join(''):'<p class="empty">No predictions yet.'+(admin?' Use Add prediction to post the first one.':' Check back soon.')+'</p>')+'</section></div></div><footer><div class="wrap">Swazzi Football. Predictions are opinions for entertainment and are not betting advice.'+(admin?'':' <button class="lnk" data-act="login">Admin login</button>')+'</div></footer>';
+  h+='<section><h2>Match predictions</h2><p class="sub">Win, draw and loss chances, plus our score pick.</p>'+(Ps.length?Ps.map(function(x){return '<div class="card"><div class="row"><span>'+esc(x.home)+' v '+esc(x.away)+'</span><span class="sc">'+esc(x.score)+'</span></div><div class="lg">'+esc(x.league)+'</div>'+bar(x)+(x.note?'<p class="why">'+esc(x.note)+'</p>':'')+tools('p',x.id)+'</div>'}).join(''):'<p class="empty">No predictions yet.'+(admin?' Use Add prediction to post the first one.':' Check back soon.')+'</p>')+'</section></div></div><footer><div class="wrap">Swazzi Football. Predictions are opinions for entertainment and are not betting advice.</div></footer>';
   $('root').innerHTML=h}
 async function load(){
   var a=await sb.from('articles').select('*').order('created_at',{ascending:false}),p=await sb.from('preds').select('*').order('created_at',{ascending:false});
@@ -132,7 +132,10 @@ document.addEventListener('click',async function(e){
   else if(a=='del-a'&&confirm('Delete this article for all readers?')){var r=await sb.from('articles').delete().eq('id',id);r.error?toast('Could not delete.'):load()}
   else if(a=='del-p'&&confirm('Delete this prediction for all readers?')){var r2=await sb.from('preds').delete().eq('id',id);r2.error?toast('Could not delete.'):load()}
 });
-if(CFG.url&&CFG.key&&window.supabase){sb=supabase.createClient(CFG.url,CFG.key);sb.auth.onAuthStateChange(function(ev,s){admin=!!s;render()});load()}else render();
+if(CFG.url&&CFG.key&&window.supabase){sb=supabase.createClient(CFG.url,CFG.key);sb.auth.onAuthStateChange(function(ev,s){admin=!!s;render();if(ev=='INITIAL_SESSION')chk()});load()}else render();
+function chk(){if(location.hash=='#admin'&&sb&&!admin&&!document.querySelector('dialog'))loginDlg()}
+window.addEventListener('hashchange',chk);
 </script>
 </body>
 </html>
+
