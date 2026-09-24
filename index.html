@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Swazzi Sports | Football news and predictions</title>
+<title>Swazzi Football | News and predictions</title>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <style>
@@ -59,78 +59,4 @@ h2{font-family:var(--display);font-weight:800;font-size:32px;margin:0 0 6px}
 .tools{display:flex;gap:6px;margin-top:8px}
 .empty{color:var(--muted);padding:12px 0}
 footer{border-top:2px solid var(--ink);padding:20px 0 30px;color:var(--muted);font-size:14px}
-dialog{border:2px solid var(--ink);border-radius:14px;background:var(--surface);color:var(--ink);width:min(560px,94vw);padding:20px}
-dialog::backdrop{background:rgba(10,15,40,.6)}
-dialog h3{margin:0 0 12px;font-family:var(--display);font-size:28px}
-label{display:block;font-size:14px;font-weight:700;margin:10px 0 3px}
-input,select,textarea{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap}
-.err{color:var(--red);font-size:14px;min-height:20px;margin-top:8px}
-#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;z-index:9;display:none}
-@media (max-width:760px){.hero,.cols{grid-template-columns:1fr}}
-.lnk{background:none;border:0;color:var(--muted);text-decoration:underline;padding:0}
-.note{background:var(--surface);border:2px solid var(--gold);border-radius:10px;padding:14px;margin:16px 0}</style>
-</head>
-<body>
-<div id="root"></div>
-<div id="toast" role="status"></div>
-<script>
-var CFG={url:"https://hqxhdjrijqxtjljuygnr.supabase.co",key:"sb_publishable_aanfhv6s36L43huoBgRKTg_jN7405fY"};
-var LG=["Premier League","La Liga","Serie A","Bundesliga","Champions League"],cur="All",sb=null,admin=false,A=[],P=[];
-function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
-function $(i){return document.getElementById(i)}
-function toast(m){var t=$('toast');t.textContent=m;t.style.display='block';setTimeout(function(){t.style.display='none'},4000)}
-function fmt(d){try{return new Date(d).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'})}catch(e){return ''}}
-function bar(x){return '<div class="bar" role="img" aria-label="Home '+x.h+'%, draw '+x.d+'%, away '+x.a+'%"><span class="b-h" style="width:'+x.h+'%"></span><span class="b-d" style="width:'+x.d+'%"></span><span class="b-a" style="width:'+x.a+'%"></span></div><div class="legend"><span>Home '+x.h+'%</span><span>Draw '+x.d+'%</span><span>Away '+x.a+'%</span></div>'}
-function tools(k,id){return admin?'<div class="tools"><button class="btn o" data-act="edit-'+k+'" data-id="'+id+'">Edit</button><button class="btn o" data-act="del-'+k+'" data-id="'+id+'">Delete</button></div>':''}
-function render(){
-  if(!sb){$('root').innerHTML='<div class="wrap"><div class="note"><b>Almost there.</b> Add your Supabase URL and key at the top of this file to connect Swazzi Sports.</div></div>';return}
-  var As=A.filter(function(x){return cur=="All"||x.league==cur}),Ps=P.filter(function(x){return cur=="All"||x.league==cur}),f=Ps[0],h='';
-  if(admin)h+='<div class="adm"><div class="wrap"><b>Admin mode</b><button class="btn" data-act="new-a">Write article</button><button class="btn" data-act="new-p">Add prediction</button><button class="btn o" data-act="out">Log out</button></div></div>';
-  h+='<div class="wrap"><header class="top"><div class="logo"><i></i>SWAZZI SPORTS</div><nav aria-label="Filter by competition">'+["All"].concat(LG).map(function(l){return '<button class="chip" data-act="chip" data-l="'+l+'" aria-pressed="'+(l==cur)+'">'+l+'</button>'}).join('')+'</nav></header>';
-  h+='<section class="hero"><div><h1>Football only. Every pick explained.</h1><p>Daily football news and match predictions from the leagues that matter.</p></div><div class="feat">'+(f?'<small>Latest prediction: '+esc(f.league)+'</small><div class="vs"><span>'+esc(f.home)+'</span><em>v</em><span>'+esc(f.away)+'</span></div>'+bar(f)+'<div class="pick">Our pick:<b>'+esc(f.score)+'</b></div>':'<p class="empty">Predictions will appear here.</p>')+'</div></section>';
-  h+='<div class="cols"><section><h2>Latest news</h2><p class="sub">Tap a headline to read the full story.</p>'+(As.length?As.map(function(x){return '<article class="story"><details><summary><span class="tag">'+esc(x.league)+'</span><h3>'+esc(x.title)+'</h3><p>'+esc(x.summary)+'</p><span class="meta">'+fmt(x.created_at)+'</span></summary><div class="body">'+String(x.body||'').split(/\n\s*\n/).map(function(p){return '<p>'+esc(p)+'</p>'}).join('')+'</div></details>'+tools('a',x.id)+'</article>'}).join(''):'<p class="empty">No stories yet.'+(admin?' Use Write article to add the first one.':' Check back soon.')+'</p>')+'</section>';
-  h+='<section><h2>Match predictions</h2><p class="sub">Win, draw and loss chances, plus our score pick.</p>'+(Ps.length?Ps.map(function(x){return '<div class="card"><div class="row"><span>'+esc(x.home)+' v '+esc(x.away)+'</span><span class="sc">'+esc(x.score)+'</span></div><div class="lg">'+esc(x.league)+'</div>'+bar(x)+(x.note?'<p class="why">'+esc(x.note)+'</p>':'')+tools('p',x.id)+'</div>'}).join(''):'<p class="empty">No predictions yet.'+(admin?' Use Add prediction to post the first one.':' Check back soon.')+'</p>')+'</section></div></div><footer><div class="wrap">Swazzi Sports. Predictions are opinions for entertainment and are not betting advice.'+(admin?'':' <button class="lnk" data-act="login">Admin login</button>')+'</div></footer>';
-  $('root').innerHTML=h}
-async function load(){
-  var a=await sb.from('articles').select('*').order('created_at',{ascending:false}),p=await sb.from('preds').select('*').order('created_at',{ascending:false});
-  if(a.error||p.error){toast('Could not load content. Check your Supabase setup.');return}
-  A=a.data;P=p.data;render()}
-function opts(v){return LG.map(function(l){return '<option'+(l==v?' selected':'')+'>'+l+'</option>'}).join('')}
-function dlg(html){var d=document.createElement('dialog');d.innerHTML=html;document.body.appendChild(d);d.addEventListener('close',function(){d.remove()});d.showModal();d.querySelector('[data-c]').onclick=function(){d.close()};return d}
-async function save(q,d){var r=await q;if(r.error){$('f-e').textContent='Could not save: '+r.error.message;return}d.close();await load()}
-function loginDlg(){
-  var d=dlg('<h3>Admin login</h3><label>Email</label><input id="l-e" type="email" autocomplete="username"><label>Password</label><input id="l-p" type="password" autocomplete="current-password"><div class="err" id="f-e"></div><div class="acts"><button class="btn o" data-c>Cancel</button><button class="btn" data-s>Log in</button></div>');
-  d.querySelector('[data-s]').onclick=async function(){var r=await sb.auth.signInWithPassword({email:$('l-e').value.trim(),password:$('l-p').value});if(r.error){$('f-e').textContent='Login failed. Check your email and password.';return}d.close()}}
-function artDlg(x){
-  var dr={};try{dr=JSON.parse(localStorage.getItem('sz_draft')||'{}')}catch(e){}
-  var n=!x;x=x||dr;
-  var d=dlg('<h3>'+(n?'Write article':'Edit article')+'</h3><label>Competition</label><select id="f-l">'+opts(x.league)+'</select><label>Headline</label><input id="f-t" maxlength="120" value="'+esc(x.title)+'"><label>Summary (one or two sentences)</label><textarea id="f-s" rows="2" maxlength="240">'+esc(x.summary)+'</textarea><label>Story</label><textarea id="f-b" rows="8">'+esc(x.body)+'</textarea><div class="err" id="f-e"></div><div class="acts">'+(n?'<button class="btn o" data-d>Save draft</button>':'')+'<button class="btn o" data-c>Cancel</button><button class="btn" data-s>'+(n?'Publish article':'Save changes')+'</button></div>');
-  function val(){return{league:$('f-l').value,title:$('f-t').value.trim(),summary:$('f-s').value.trim(),body:$('f-b').value.trim()}}
-  var db=d.querySelector('[data-d]');if(db)db.onclick=function(){try{localStorage.setItem('sz_draft',JSON.stringify(val()));toast('Draft saved on this device.')}catch(e){toast('Could not save draft.')}};
-  d.querySelector('[data-s]').onclick=function(){var v=val();if(!v.title||!v.body){$('f-e').textContent='Add a headline and the story text.';return}
-    if(n)try{localStorage.removeItem('sz_draft')}catch(e){}
-    save(n?sb.from('articles').insert(v):sb.from('articles').update(v).eq('id',x.id),d)}}
-function predDlg(x){var n=!x;x=x||{h:40,d:30,a:30};
-  var d=dlg('<h3>'+(n?'Add prediction':'Edit prediction')+'</h3><label>Competition</label><select id="f-l">'+opts(x.league)+'</select><div class="g3"><div><label>Home team</label><input id="f-h" value="'+esc(x.home)+'"></div><div><label>Away team</label><input id="f-a" value="'+esc(x.away)+'"></div><div><label>Score pick</label><input id="f-sc" placeholder="2-1" value="'+esc(x.score)+'"></div></div><div class="g3"><div><label>Home win %</label><input id="f-ph" type="number" min="0" max="100" value="'+x.h+'"></div><div><label>Draw %</label><input id="f-pd" type="number" min="0" max="100" value="'+x.d+'"></div><div><label>Away win %</label><input id="f-pa" type="number" min="0" max="100" value="'+x.a+'"></div></div><label>Why we like it</label><textarea id="f-n" rows="3" maxlength="240">'+esc(x.note)+'</textarea><div class="err" id="f-e"></div><div class="acts"><button class="btn o" data-c>Cancel</button><button class="btn" data-s>'+(n?'Publish prediction':'Save changes')+'</button></div>');
-  d.querySelector('[data-s]').onclick=function(){var v={league:$('f-l').value,home:$('f-h').value.trim(),away:$('f-a').value.trim(),score:$('f-sc').value.trim(),h:+$('f-ph').value,d:+$('f-pd').value,a:+$('f-pa').value,note:$('f-n').value.trim()};
-    if(!v.home||!v.away||!v.score){$('f-e').textContent='Add both teams and a score pick.';return}
-    if(v.h+v.d+v.a!==100){$('f-e').textContent='The three percentages must add up to 100 (now '+(v.h+v.d+v.a)+').';return}
-    save(n?sb.from('preds').insert(v):sb.from('preds').update(v).eq('id',x.id),d)}}
-document.addEventListener('click',async function(e){
-  var b=e.target.closest('[data-act]');if(!b)return;var a=b.dataset.act,id=b.dataset.id;
-  function find(l){return l.filter(function(x){return x.id==id})[0]}
-  if(a=='chip'){cur=b.dataset.l;render()}
-  else if(a=='login')loginDlg();
-  else if(!admin)return;
-  else if(a=='out')await sb.auth.signOut();
-  else if(a=='new-a')artDlg();else if(a=='new-p')predDlg();
-  else if(a=='edit-a')artDlg(find(A));else if(a=='edit-p')predDlg(find(P));
-  else if(a=='del-a'&&confirm('Delete this article for all readers?')){var r=await sb.from('articles').delete().eq('id',id);r.error?toast('Could not delete.'):load()}
-  else if(a=='del-p'&&confirm('Delete this prediction for all readers?')){var r2=await sb.from('preds').delete().eq('id',id);r2.error?toast('Could not delete.'):load()}
-});
-if(CFG.url&&CFG.key&&window.supabase){sb=supabase.createClient(CFG.url,CFG.key);sb.auth.onAuthStateChange(function(ev,s){admin=!!s;render()});load()}else render();
-</script>
-</body>
-</html>
+dialog{border:2px solid var(--ink);border-radius:14px;background:var(--surface);color:var(--ink);width:min(560​​​​​​​​​​​​​​​​
